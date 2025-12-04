@@ -4,104 +4,115 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pro ID Card Generator</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome (আইকনের জন্য) -->
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
-<!-- অ্যানিমেটেড ব্যাকগ্রাউন্ড শেপ -->
-<div class="background-shapes">
-    <div class="shape shape-1"></div>
-    <div class="shape shape-2"></div>
-    <div class="shape shape-3"></div>
-</div>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"><i class="fa-solid fa-circle-check"></i> Download Started Successfully!</div>
 
-<div class="main-wrapper">
-    <div class="glass-container">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-content">
+            <h1><i class="fa-solid fa-id-card"></i> ID Generator <span class="badge">ULTRA</span></h1>
+            <button id="themeToggle" class="theme-btn">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="main-container">
         
-        <!-- বাম পাশ: ইনপুট ফর্ম -->
-        <div class="form-panel">
-            <div class="form-header">
-                <i class="fa-solid fa-id-card-clip logo-icon"></i>
-                <h2>ID Card Generator</h2>
-                <p>Fill the details to generate professional card</p>
+        <!-- Input Form Section -->
+        <div class="form-panel fade-in-up">
+            <div class="panel-header">
+                <h3>Student Details</h3>
+                <div class="header-actions">
+                    <button onclick="resetForm()" id="resetBtn" class="btn-reset" title="Clear All Data">
+                        <i class="fa-solid fa-rotate-right"></i> Reset
+                    </button>
+                </div>
             </div>
             
-            <div class="scrollable-form">
-                <div class="form-group">
+            <div class="form-grid">
+                <div class="form-group full-width">
                     <label><i class="fa-solid fa-user"></i> Student Name</label>
-                    <input type="text" id="inName" placeholder="Ex: Md. Rahim Islam" oninput="updateCard()">
+                    <input type="text" id="inName" class="input-field" placeholder="Enter Full Name" oninput="validateName(this, 'errName')">
+                    <span id="errName" class="error-msg">Text only! No numbers allowed.</span>
                 </div>
 
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label><i class="fa-solid fa-fingerprint"></i> ID No</label>
-                        <input type="text" id="inID" placeholder="123456" maxlength="10" oninput="validateNumber(this, 'errID')">
-                        <span id="errID" class="error-msg">Only numbers allowed!</span>
-                    </div>
-                    
-                    <div class="form-group half">
-                        <label><i class="fa-solid fa-layer-group"></i> Batch</label>
-                        <input type="text" id="inBatch" placeholder="29" maxlength="10" oninput="validateNumber(this, 'errBatch')">
-                        <span id="errBatch" class="error-msg">Only numbers!</span>
-                    </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-fingerprint"></i> ID No</label>
+                    <input type="text" id="inID" class="input-field" placeholder="123456" maxlength="10" oninput="validateNumber(this, 'errID')">
+                    <span id="errID" class="error-msg">Numbers only!</span>
                 </div>
 
                 <div class="form-group">
                     <label><i class="fa-solid fa-calendar-days"></i> Session</label>
-                    <input type="text" id="inSession" placeholder="2024-2025" maxlength="10" oninput="validateSession(this, 'errSession')">
-                    <span id="errSession" class="error-msg">Numbers & hyphen only!</span>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group half">
-                        <label><i class="fa-solid fa-graduation-cap"></i> Level</label>
-                        <select id="inLevel" onchange="updateCard()">
-                            <option value="HSC">HSC</option>
-                            <option value="Honours">Honours</option>
-                            <option value="Masters">Masters</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group half">
-                        <label><i class="fa-solid fa-flask"></i> Group</label>
-                        <select id="inGroup" onchange="updateCard()">
-                            <option value="Science">Science</option>
-                            <option value="Arts">Arts</option>
-                            <option value="Commerce">Commerce</option>
-                        </select>
-                    </div>
+                    <input type="text" id="inSession" class="input-field" placeholder="2024-2025" maxlength="10" oninput="validateSession(this, 'errSession')">
+                    <span id="errSession" class="error-msg">Invalid format!</span>
                 </div>
 
                 <div class="form-group">
-                    <label><i class="fa-solid fa-camera"></i> Upload Photo</label>
-                    <div class="file-upload-wrapper">
-                        <input type="file" id="inPhoto" accept="image/*" onchange="loadPhoto(event)">
-                        <span class="file-custom-text">Choose File...</span>
-                    </div>
+                    <label><i class="fa-solid fa-graduation-cap"></i> Study Level</label>
+                    <select id="inLevel" class="input-field" onchange="updateCard()">
+                        <option value="HSC">HSC</option>
+                        <option value="Honours">Honours</option>
+                        <option value="Masters">Masters</option>
+                    </select>
                 </div>
 
-                <button onclick="downloadCardImage()" class="print-btn">
-                    <i class="fa-solid fa-download"></i> Download HD Image
+                <div class="form-group">
+                    <label><i class="fa-solid fa-users-rectangle"></i> Batch</label>
+                    <input type="text" id="inBatch" class="input-field" placeholder="29" maxlength="5" oninput="validateNumber(this, 'errBatch')">
+                    <span id="errBatch" class="error-msg">Numbers only!</span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-layer-group"></i> Group</label>
+                    <select id="inGroup" class="input-field" onchange="updateCard()">
+                        <option value="Science">Science</option>
+                        <option value="Arts">Arts</option>
+                        <option value="Commerce">Commerce</option>
+                    </select>
+                </div>
+
+                <div class="form-group full-width upload-group">
+                    <label for="inPhoto" class="upload-label">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload Photo
+                    </label>
+                    <input type="file" id="inPhoto" accept="image/*" onchange="loadPhoto(event)">
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button onclick="downloadCardImage()" id="btnJpg" class="btn btn-primary ripple">
+                    <i class="fa-solid fa-image"></i> Save JPG
+                </button>
+                <button onclick="downloadCardPDF()" id="btnPdf" class="btn btn-secondary ripple">
+                    <i class="fa-solid fa-file-pdf"></i> Save PDF
                 </button>
             </div>
         </div>
 
-        <!-- ডান পাশ: কার্ড প্রিভিউ -->
+        <!-- Preview Section -->
         <div class="preview-panel">
-            <div class="preview-title">Live Preview</div>
+            <div class="preview-header">
+                <h3>Live Preview <small>(Interactive)</small></h3>
+            </div>
             
-            <!-- কার্ডের মূল অংশ (ডিজাইন অপরিবর্তিত) -->
-            <div class="id-card-wrapper">
+            <div class="tilt-wrapper" id="tiltContainer">
                 <div class="id-card" id="cardCapture">
-                    
+                    <!-- Design Elements -->
                     <div class="black-stripe"></div>
                     <div class="top-stripe">
                         <div class="stripe-green"></div>
@@ -109,7 +120,7 @@
                     </div>
 
                     <div class="card-header">
-                        <img src="https://scontent.fdac165-1.fna.fbcdn.net/v/t39.30808-6/512611029_1340984224699269_8287079065409781095_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeG15u0grMmNb_SPcI1xpc8GvBL23JiKHiS8EvbcmIoeJH8qFGXx88n7rwNOVOkqqm03Yyp7R-kgkKpGjUTR-mJ7&_nc_ohc=OLDnOKoiwHsQ7kNvwGkdy8y&_nc_oc=Adm0Bgn0g5wzhCbYAJ6hkl2L0vk3pjIZvRo73v1d12Yqnf2bTdBbxW9O3NKGFCKMOPg&_nc_zt=23&_nc_ht=scontent.fdac165-1.fna&_nc_gid=2ErvDEs_mmvVsZU5aLmtpw&oh=00_AfmIaTG7Sj8kQP9ym6AuaKx8vrFhR013htyMg9ylunFStg&oe=693480F2" class="college-logo" crossorigin="anonymous">
+                        <img src="https://scontent.fdac165-1.fna.fbcdn.net/v/t39.30808-6/512611029_1340984224699269_8287079065409781095_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeG15u0grMmNb_SPcI1xpc8GvBL23JiKHiS8EvbcmIoeJH8qFGXx88n7rwNOVOkqqm03Yyp7R-kgkKpGjUTR-mJ7&_nc_ohc=OLDnOKoiwHsQ7kNvwGkdy8y&_nc_oc=Adm0Bgn0g5wzhCbYAJ6hkl2L0vk3pjIZvRo73v1d12Yqnf2bTdBbxW9O3NKGFCKMOPg&_nc_zt=23&_nc_ht=scontent.fdac165-1.fna&_nc_gid=2ErvDEs_mmvVsZU5aLmtpw&oh=00_AfmIaTG7Sj8kQP9ym6AuaKx8vrFhR013htyMg9ylunFStg&oe=693480F2" class="college-logo" crossorigin="anonymous" alt="College Logo">
                         <div class="college-text">
                             <p class="bengali-slogan">জীবনদক্ষতাপূর্ণ শিক্ষায় শাশ্বত মানবিকতা</p>
                             <h2 class="college-name">Padma Government College,<br>Rajshahi</h2>
@@ -117,30 +128,34 @@
                     </div>
 
                     <div class="photo-area">
-                        <img id="previewPhoto" src="https://via.placeholder.com/150" alt="Student">
+                        <img id="previewPhoto" src="https://via.placeholder.com/150" alt="Student Photo">
                     </div>
 
                     <h2 class="student-name" id="outName">Student Name</h2>
 
                     <div class="details-section">
-                        <img src="https://scontent.fdac165-1.fna.fbcdn.net/v/t39.30808-6/512611029_1340984224699269_8287079065409781095_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeG15u0grMmNb_SPcI1xpc8GvBL23JiKHiS8EvbcmIoeJH8qFGXx88n7rwNOVOkqqm03Yyp7R-kgkKpGjUTR-mJ7&_nc_ohc=OLDnOKoiwHsQ7kNvwGkdy8y&_nc_oc=Adm0Bgn0g5wzhCbYAJ6hkl2L0vk3pjIZvRo73v1d12Yqnf2bTdBbxW9O3NKGFCKMOPg&_nc_zt=23&_nc_ht=scontent.fdac165-1.fna&_nc_gid=2ErvDEs_mmvVsZU5aLmtpw&oh=00_AfmIaTG7Sj8kQP9ym6AuaKx8vrFhR013htyMg9ylunFStg&oe=693480F2" class="watermark" crossorigin="anonymous">
+                        <img src="https://scontent.fdac165-1.fna.fbcdn.net/v/t39.30808-6/512611029_1340984224699269_8287079065409781095_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeG15u0grMmNb_SPcI1xpc8GvBL23JiKHiS8EvbcmIoeJH8qFGXx88n7rwNOVOkqqm03Yyp7R-kgkKpGjUTR-mJ7&_nc_ohc=OLDnOKoiwHsQ7kNvwGkdy8y&_nc_oc=Adm0Bgn0g5wzhCbYAJ6hkl2L0vk3pjIZvRo73v1d12Yqnf2bTdBbxW9O3NKGFCKMOPg&_nc_zt=23&_nc_ht=scontent.fdac165-1.fna&_nc_gid=2ErvDEs_mmvVsZU5aLmtpw&oh=00_AfmIaTG7Sj8kQP9ym6AuaKx8vrFhR013htyMg9ylunFStg&oe=693480F2" class="watermark" crossorigin="anonymous" alt="Watermark">
 
                         <div class="info-grid">
                             <div class="label">ID No</div>
                             <div class="value">: <span id="outID">123456</span></div>
+
                             <div class="label">Session</div>
                             <div class="value">: <span id="outSession">2024-2025</span></div>
+
                             <div class="label">Study Level</div>
                             <div class="value">: <span id="outLevel">HSC</span></div>
+
                             <div class="label">Batch</div>
                             <div class="value">: <span id="outBatch">29</span></div>
+
                             <div class="label">Group</div>
                             <div class="value">: <span id="outGroup">Science</span></div>
                         </div>
                     </div>
 
+                    <!-- Footer Section (Fixed: Signature on Right Side) -->
                     <div class="footer-section">
-                        <div class="qr-box" id="qrcode"></div>
                         <div class="signature-box">
                             <img src="sir.png" crossorigin="anonymous" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/e/ec/Signature_sample.svg'" alt="Sign" class="sign-img">
                             <div class="principal-text">Principal</div>
@@ -152,13 +167,17 @@
                         <div class="stripe-red"></div>
                     </div>
                     <div class="black-stripe"></div>
-
+                    
+                    <div class="glare"></div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="script.js"></script>
+    <footer class="main-footer">
+        <p>Made by <span class="brand-highlight">Rafid Tech BD</span> | &copy; 2025 All Rights Reserved</p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
